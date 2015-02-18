@@ -30,7 +30,7 @@ class Squad
   # should return a squad by id
   # or nil if not found
   def self.find id
-    new @conn.exec('SELECT * FROM squads WHERE id = ($1)', [ id ] )[0], true
+    new @conn.exec('SELECT * FROM squads WHERE id = ($1)', [ id ] )[0]
   end
 
   def students

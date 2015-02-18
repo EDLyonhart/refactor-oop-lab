@@ -26,22 +26,21 @@ get '/' do
   redirect '/squads'
 end
 
-get '/squads' do
+get '/squads' do                              #display all squads
   @squads = Squad.all
   erb :'squads/index'
 end
 
-get '/squads/new' do
+get '/squads/new' do                          #display create squad page
   erb :'squads/add'
 end
 
-get '/squads/:id' do
+get '/squads/:id' do                          #display specific squad
   @squad = Squad.find params[:id].to_i 
-
   erb :'squads/show'
 end
 
-get '/squads/:id/edit' do
+get '/squads/:id/edit' do                     #display squad edit
   @squad = Squad.find params[:id].to_i
   erb :'squads/edit'
 end
@@ -66,45 +65,39 @@ end
 
 # STUDENT ROUTES
 
-get '/squads/:squad_id/students' do
+get '/squads/:squad_id/students' do                           #display all students from a squad
   @students = Squad.find(params[:squad_id].to_i).students
   erb :'students/index'
 end
 
-get '/squads/:squad_id/students/new' do
+get '/squads/:squad_id/students/new' do                       #display create student page
   @squad_id = params[:squad_id].to_i
   erb :'students/add'
 end
 
-get '/squads/:squad_id/students/:student_id' do
-  squad_id = params[:squad_id].to_i
-  id = params[:student_id].to_i
-  student = @conn.exec('SELECT * FROM students WHERE id = $1 AND squad_id = $2', [ id, squad_id ] )
-  @student = student[0]
+get '/squads/:squad_id/students/:student_id' do                       #display specific student
+  @student = Student.find params[:squad_id].to_i
+
   erb :'students/show'
 end
 
-get '/squads/:squad_id/students/:student_id/edit' do
-  squad_id = params[:squad_id].to_i
-  id = params[:student_id].to_i
-  student = @conn.exec('SELECT * FROM students WHERE id = $1 AND squad_id = $2', [ id, squad_id ] )
+get '/squads/:squad_id/students/:student_id/edit' do          #display student edit
+  @student = Student.find(params[:id].to_i, params[:squad_id].to_i).students
   @student = student[0]
   erb :'students/edit'
 end
 
-post '/squads/:squad_id/students' do
-  @conn.exec('INSERT INTO students (name, age, spirit_animal, squad_id) values ($1,$2,$3,$4)', [ params[:name]  ,params[:age],params[:spirit], params[:squad_id]])
+post '/squads/:squad_id/students' do                          #create new student
+  Student.create params
   redirect "/squads/#{params[:squad_id].to_i}"
 end
 
-put '/squads/:squad_id/students/:student_id' do
-  id = params[:student_id].to_i
-  @conn.exec('UPDATE students SET name=$1, age=$2, spirit_animal=$3 WHERE id = $4', [ params[:name], params[:age], params[:spirit], id ] )
+put '/squads/:squad_id/students/:student_id' do               #update student info
+  Student.edit params
   redirect "/squads/#{params[:squad_id].to_i}"
 end
 
-delete '/squads/:squad_id/students/:student_id' do
-  id = params[:student_id].to_i
-  @conn.exec('DELETE FROM students WHERE id = ($1)', [ id ] )
+delete '/squads/:squad_id/students/:student_id' do            #destroy student
+  
   redirect "/squads/#{params[:squad_id].to_i}"
 end
